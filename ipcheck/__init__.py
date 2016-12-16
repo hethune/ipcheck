@@ -7,24 +7,13 @@ app = Flask(__name__, static_folder='static')
 
 @app.route("/")
 def ipcheck():
-  proxy_headers = [
-    'via',
-    'forwarded',
-    'client-ip',
-    'useragent_via',
-    'proxy_connection',
-    'xproxy_connection',
-    'http_pc_remote_addr',
-    'http_client_ip',
-    'http_x_appengine_country'
-  ]
+  print request.headers.keys()
 
-  headers = dict((x, request.headers.get(x)) for x in proxy_headers if request.headers.get(x) is not None)
-  dat = json.dumps(headers)
+  remote_ip = request.remote_addr
+  x_forwarded_for = request.headers.get('X-Forwarded-For')
+  via = request.headers.get('Via')
 
-  return Response(response = dat,
-    status = 200,
-    mimetype="application/json")
+  return "{};{};{}".format(remote_ip, x_forwarded_for, via)
 
 if __name__ == "__main__":
   app.run()
